@@ -1,0 +1,19 @@
+{
+  "pixi": [
+    {
+      "name": "节点动画",
+      "path": "demo"
+    },
+    {
+      "name": "接物游戏",
+      "path": "demo"
+    },
+    {
+      "name": "flappy bird",
+      "path": "demo"
+    }
+  ],
+  "three.js": [
+
+  ]
+}
