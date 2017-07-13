@@ -2,15 +2,15 @@
   "pixi": [
     {
       "name": "节点动画",
-      "path": "demo"
+      "path": "nodeAni"
     },
     {
       "name": "接物游戏",
-      "path": "demo"
+      "path": "fallGame"
     },
     {
       "name": "flappy bird",
-      "path": "demo"
+      "path": "flappyBird"
     }
   ],
   "three.js": [

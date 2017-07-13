@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/pages/home/index'
-import NodeAni from '@/pages/nodeAni/index'
-// import Demo from '@/pages/nodeAni/index'
-// import Demo from '@/pages/nodeAni/index'
+import Home from '@/pages/home/App'
+import Game from '@/pages/game/App'
 
 Vue.use(Router)
 
@@ -15,9 +13,9 @@ export default new Router({
       component: Home
     },
     {
-      path: '/demo',
-      name: 'nodeAni',
-      component: NodeAni
+      path: '/:path',
+      name: 'game',
+      component: Game
     }
   ]
 })

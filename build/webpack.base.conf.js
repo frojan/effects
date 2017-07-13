@@ -19,13 +19,17 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src')
     }
   },
+  // externals: {
+  //   'pixi.js': 'pixi.js'
+  // },
   module: {
+    // noParse: ['/pixi.js/'],
     rules: [
       {
         test: /\.(js|vue)$/,
@@ -44,6 +48,11 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
+        include: [resolve('src'), resolve('test')]
+      },
+      {
+        test: /\.ts$/,
+        loader: 'awesome-typescript-loader',
         include: [resolve('src'), resolve('test')]
       },
       {

@@ -1,5 +1,4 @@
-import Circle from 'Circle'
-import PIXI from 'pixi'
+import Circle from './Circle'
 class App{
     private static NUM = 35
     private static SCREEN_WIDTH = document.documentElement.clientWidth
@@ -24,7 +23,8 @@ class App{
             transparent: false, 
             resolution: 1
         })
-        document.body.appendChild(this.renderer.view)
+        let gameArea: any = document.querySelector('.game-area')
+        gameArea.appendChild(this.renderer.view)
         this.stage = new PIXI.Container();
 
         this.lineGraph = new PIXI.Graphics()
