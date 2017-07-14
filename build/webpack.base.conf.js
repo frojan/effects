@@ -25,9 +25,10 @@ module.exports = {
       '@': resolve('src')
     }
   },
-  // externals: {
-  //   'pixi.js': 'pixi.js'
-  // },
+  externals: {
+    'pixi.js': 'PIXI',
+    'three': 'THREE'
+  },
   module: {
     // noParse: ['/pixi.js/'],
     rules: [

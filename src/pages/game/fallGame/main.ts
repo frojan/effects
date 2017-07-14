@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js'
 import Food from './Food'
 class App{
     private static NUM = 20

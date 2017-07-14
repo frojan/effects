@@ -14,6 +14,9 @@
     }
   ],
   "three.js": [
-
+    {
+      "name": "3d world",
+      "path": "3dWorld"
+    }
   ]
 }
