@@ -1,6 +1,5 @@
 import * as THREE from 'three'
-// import Stats from 'three/examples/js/libs/stats.min'
-// import * as Stats from 'three/examples/js/libs/stats.min.js'
+import Stats from 'three/examples/js/libs/stats.min'
 
 class App{
     private static NUM = 20
@@ -17,15 +16,15 @@ class App{
     private numCatch: number = 0
     private numMiss: number = 0
 
-    // private stats: Stats
+    private stats: Stats
 
     constructor () {
         this.renderer = new THREE.WebGLRenderer()
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         let gameArea: any = document.querySelector('.game-area')
         gameArea.appendChild(this.renderer.domElement)
-        // this.stats = new Stats();
-        // gameArea.appendChild(this.stats.dom);
+        this.stats = new Stats();
+        gameArea.appendChild(this.stats.dom);
         
         this.scene = new THREE.Scene()
 
@@ -40,7 +39,7 @@ class App{
         requestAnimationFrame(this.enterFrame.bind(this));
 
         this.renderer.render( this.scene, this.camera )
-        // this.stats.update();
+        this.stats.update();
     }
 }
 

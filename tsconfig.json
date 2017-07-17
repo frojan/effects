@@ -3,9 +3,14 @@
     "target": "es5",
     "module": "es6",
     "moduleResolution": "node",
-    "strict": true,
+    // "strict": true,
+    "alwaysStrict": true,
+    "noImplicitAny": false, // true 报错
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "traceResolution": true,  // 不起作用？
     "allowSyntheticDefaultImports": true,
-    "allowJs": true,
+    // "allowJs": true,  // 不设置也可以
     "lib": [
       "es2017",
       "dom"
