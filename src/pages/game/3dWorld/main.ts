@@ -3,7 +3,6 @@ import Stats from 'three/examples/js/libs/stats.min'
 import 'three/examples/js/controls/OrbitControls'
 import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
-console.log(dat)
 
 class App{
     private static NUM = 20
@@ -21,6 +20,8 @@ class App{
     private ambLight: THREE.AmbientLight
     private dirLight: THREE.DirectionalLight
     private box: THREE.Mesh
+
+    private config: FizzyText
     private gui: dat.GUI
 
     constructor () {
@@ -41,32 +42,70 @@ class App{
         this.controls = new THREE.OrbitControls( this.camera, this.gameArea );
         // this.controls = new THREE.DeviceOrientationControls( this.camera );
 
-        this.initGUI()
         this.initLight()
         this.initObject()
         this.enterFrame()
+        this.initGUI()
         
     }
 
     initGUI () {
-        let text = new FizzyText();
-        this.gui = new dat.GUI({ autoPlace: false });
+        let myjson = {
+            "preset": "Default",
+            "remembered": {
+                "Default": {
+                    "0": {
+                        "width": 6.1000000000000005,
+                        "heigth": 6.9958642081681885,
+                        "depth": 7.095123212131656,
+                        "color": 65535
+                    }
+                },
+                "red": {
+                    "0": {
+                        "width": 10,
+                        "heigth": 10,
+                        "depth": 10,
+                        "color": 14876779
+                    }
+                }
+            },
+            "closed": false,
+            "folders": {
+                "大小": {
+                    "preset": "Default",
+                    "closed": false,
+                    "folders": {}
+                },
+                "颜色": {
+                    "preset": "Default",
+                    "closed": false,
+                    "folders": {}
+                }
+            }
+        }
+        this.config = new FizzyText();
+        this.gui = new dat.GUI({ autoPlace: false, load: myjson });
         (this.gameArea.parentElement as HTMLElement).appendChild(this.gui.domElement)
         this.gui.domElement.style.cssText = 'position: absolute; right: 0; top: 0; margin-right: 10px';
         let folder1 = this.gui.addFolder( '大小' );
-        folder1.add(text, 'width', 1, 10).step(.1).onChange(()=>{
-            this.box.scale.x = text.width
+        folder1.add(this.config, 'width', 1, 10).step(.1).onChange(()=>{
+            this.box.scale.x = this.config.width
         });
-        folder1.add(text, 'heigth', 1, 10).onChange(()=>{
-            this.box.scale.y = text.heigth
+        folder1.add(this.config, 'heigth', 1, 10).onChange(()=>{
+            this.box.scale.y = this.config.heigth
         });
-        folder1.add(text, 'depth', 1, 10).onChange(()=>{
-            this.box.scale.z = text.depth
+        folder1.add(this.config, 'depth', 1, 10).onChange(()=>{
+            this.box.scale.z = this.config.depth
         });
         let folder2 = this.gui.addFolder( '颜色' );
-        folder2.addColor(text, 'color').onChange(()=>{
-            (this.box.material as THREE.MeshPhongMaterial).color = new THREE.Color(text.color)
+        folder2.addColor(this.config, 'color').onChange(()=>{
+            (this.box.material as THREE.MeshPhongMaterial).color = new THREE.Color(this.config.color)
         });
+
+        this.gui.remember(this.config)
+        this.gui.revert(this.gui)
+        console.log(this.config)
     }
 
     initLight() {
