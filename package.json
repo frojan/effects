@@ -11,8 +11,10 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "@types/dat-gui": "^0.6.3",
     "@types/pixi.js": "^4.5.1",
     "@types/three": "^0.84.16",
+    "dat.gui": "^0.6.1",
     "pixi.js": "^4.5.3",
     "three": "^0.86.0",
     "vue": "^2.3.3",

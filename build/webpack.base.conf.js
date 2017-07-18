@@ -27,7 +27,8 @@ module.exports = {
   },
   externals: {
     'pixi.js': 'PIXI',
-    'three': 'THREE'
+    'three': 'THREE',
+    'dat-gui': 'dat'
   },
   module: {
     // noParse: ['/pixi.js/'],

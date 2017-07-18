@@ -24,6 +24,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+  canvas{
+    vertical-align: top;
+  }
 </style>
