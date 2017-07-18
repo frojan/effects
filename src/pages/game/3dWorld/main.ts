@@ -105,7 +105,6 @@ class App{
 
         this.gui.remember(this.config)
         this.gui.revert(this.gui)
-        console.log(this.config)
     }
 
     initLight() {
