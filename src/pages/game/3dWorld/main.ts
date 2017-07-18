@@ -10,6 +10,7 @@ class App{
     private static SCREEN_WIDTH = document.documentElement.clientWidth
     private static SCREEN_HEIGHT = document.documentElement.clientHeight
 
+    private gameArea: HTMLElement
     private renderer: THREE.WebGLRenderer
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
@@ -27,17 +28,17 @@ class App{
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.stats = new Stats();
-        let gameArea: Element | null = document.querySelector('.game-area')
-        if(gameArea) {
-            gameArea.appendChild(this.renderer.domElement)
-            gameArea.appendChild(this.stats.dom);
+        this.gameArea = <HTMLElement>document.querySelector('.game-area')
+        if(this.gameArea) {
+            this.gameArea.appendChild(this.renderer.domElement)
+            this.gameArea.appendChild(this.stats.dom);
         }
         
         this.scene = new THREE.Scene()
 
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
         this.camera.position.z = 10;
-        this.controls = new THREE.OrbitControls( this.camera, <HTMLElement>gameArea );
+        this.controls = new THREE.OrbitControls( this.camera, this.gameArea );
         // this.controls = new THREE.DeviceOrientationControls( this.camera );
 
         this.initGUI()
@@ -49,15 +50,17 @@ class App{
 
     initGUI () {
         let text = new FizzyText();
-        this.gui = new dat.GUI()
+        this.gui = new dat.GUI({ autoPlace: false });
+        (this.gameArea.parentElement as HTMLElement).appendChild(this.gui.domElement)
+        this.gui.domElement.style.cssText = 'position: absolute; right: 0; top: 0; margin-right: 10px';
         let folder1 = this.gui.addFolder( '大小' );
-        folder1.add(text, 'width', 1, 10, .1).onChange(()=>{
+        folder1.add(text, 'width', 1, 10).step(.1).onChange(()=>{
             this.box.scale.x = text.width
         });
-        folder1.add(text, 'heigth', 1, 10, .1).onChange(()=>{
+        folder1.add(text, 'heigth', 1, 10).onChange(()=>{
             this.box.scale.y = text.heigth
         });
-        folder1.add(text, 'depth', 1, 10, .1).onChange(()=>{
+        folder1.add(text, 'depth', 1, 10).onChange(()=>{
             this.box.scale.z = text.depth
         });
         let folder2 = this.gui.addFolder( '颜色' );
