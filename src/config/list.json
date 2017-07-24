@@ -15,8 +15,12 @@
   ],
   "three.js": [
     {
-      "name": "3d world",
-      "path": "3dWorld"
+      "name": "baseBox",
+      "path": "baseBox"
+    },
+    {
+      "name": "skyBox",
+      "path": "skyBox"
     }
   ]
 }

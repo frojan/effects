@@ -118,6 +118,12 @@ class App{
     }
     
     initObject () {
+        let planeGeo = new THREE.PlaneGeometry(100,100,10,10)
+        let planeMat = new THREE.MeshBasicMaterial({wireframe: true})
+        let plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.rotateX(Math.PI*0.5)
+        this.scene.add( plane );
+
         let boxGeo = new THREE.BoxGeometry(1, 1, 1)
         let boxMat = new THREE.MeshPhongMaterial( { color: 0x00ffff } )
         
