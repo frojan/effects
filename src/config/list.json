@@ -21,6 +21,10 @@
     {
       "name": "skyBox",
       "path": "skyBox"
+    },
+    {
+      "name": "particle",
+      "path": "particle"
     }
   ]
 }
