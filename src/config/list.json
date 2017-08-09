@@ -23,8 +23,12 @@
       "path": "skyBox"
     },
     {
-      "name": "particle",
-      "path": "particle"
+      "name": "particle_points",
+      "path": "particle_points"
+    },
+    {
+      "name": "particle_sprite",
+      "path": "particle_sprite"
     }
   ]
 }

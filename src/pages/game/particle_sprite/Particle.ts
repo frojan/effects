@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-class Particle extends THREE.Sprite{
+class Particle extends THREE.Points{
 
     public speedX: number = 0
     public speedY: number = 0
@@ -38,8 +38,8 @@ class Particle extends THREE.Sprite{
         this.rotation.z = val;
     }
 
-    constructor(material: THREE.SpriteMaterial){
-        super(material)
+    constructor(geometry: THREE.Geometry, material: THREE.Material){
+        super(geometry, material)
     }
 
     update () {

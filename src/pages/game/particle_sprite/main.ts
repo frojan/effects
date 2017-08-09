@@ -4,6 +4,9 @@ import 'three/examples/js/controls/OrbitControls'
 import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
 import Particle from './Particle'
+declare function require(string): string;
+var imgSrc = require('@/assets/chong.png')
+var imgSrc2 = require('@/assets/logo.png')
 
 class App{
     private static SCREEN_WIDTH = document.documentElement.clientWidth
@@ -23,23 +26,31 @@ class App{
     private particles: Particle[] = []
     private particleContainer: THREE.Group
     private defaultMaterial: THREE.CanvasTexture
-    private particleMaterial: THREE.SpriteMaterial
+
+    private particleMaterial: THREE.Material
+    private particleGeometry: THREE.Geometry
+    
+    private animationFrameLength: number = 40
+    private uniforms: any
+    private clock = new THREE.Clock();
+    private targetFrame: number = 0;
+    private rate = 0
 
     private particleConfig = {
         "textures": [
             "resource/chong.png"
         ],
-        "number": 1000,
+        "number": 100,
         "minPos": {
-            "x": -100,
-            "y": -100,
-            "z": -100,
+            "x": -200,
+            "y": -200,
+            "z": -200,
             "w": 1
         },
         "maxPos": {
-            "x": 100,
-            "y": 100,
-            "z": 100,
+            "x": 200,
+            "y": 200,
+            "z": 200,
             "w": 1
         },
         "minSpeed": {
@@ -82,6 +93,7 @@ class App{
 
     constructor () {
         this.renderer = new THREE.WebGLRenderer({antialias: true})
+        this.renderer.setClearColor(new THREE.Color(0x333333), 1)
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.stats = new Stats();
@@ -112,17 +124,88 @@ class App{
         plane.rotateX(Math.PI*0.5)
         this.scene.add( plane );
     }
-    initParticle () {
-        this.defaultMaterial = new THREE.CanvasTexture( this.generateSprite() );
-        this.particleMaterial = new THREE.SpriteMaterial({
-            color: 0xff0000,
-            rotation: Math.PI / 4
+    createShaderMaterial () {
+        var vertexshader = 
+            `varying vec4 mcolor;
+            void main() {
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                gl_PointSize = 1000.0 / gl_Position.w;
+                mcolor = vec4(color.r,color.g,color.b, 1.0);
+            }`;
+        var fragmentShader = 
+            `varying vec4 mcolor;
+            uniform sampler2D texture;
+            uniform vec2 offset;
+            uniform vec2 repeat;
+            uniform float tframe;
+            void main() {
+                vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
+                vec2 pos = vec2(floor(mcolor.r * 7.0)/8.0, mcolor.a);
+                float temp = mod(floor(mcolor.r * 40.0) + tframe, 40.0);
+                vec4 color0 = texture2D( texture, uv * repeat + vec2( mod(temp,8.0) / 8.0, 1.0-((1.0+floor(temp/8.0))/5.0) ) );
+                gl_FragColor = color0;
+            }`
+        this.uniforms = {
+            texture: {type: 't', value: THREE.ImageUtils.loadTexture(imgSrc)},
+            offset: {type: 'v2', value: new THREE.Vector2(0.0, 0.0)},
+            repeat: {type: 'v2', value: new THREE.Vector2(1/8, 1/5)},
+            tframe: {type: 'float', value: this.targetFrame},
+        }
+        var shaderMaterial = new THREE.ShaderMaterial({
+            uniforms: this.uniforms,
+            vertexShader: vertexshader,
+            fragmentShader: fragmentShader,
+            transparent: true,
+            vertexColors: THREE.VertexColors
+            // blending: THREE.AdditiveBlending
         })
+
+        return shaderMaterial
+    }
+    updateUniforms () {
+        // var theta = this.clock.getElapsedTime()  * 1.5
+        // var index = ((theta * 8 % 8)) | 0
+        // index /= 8;
+        if(this.targetFrame>=this.animationFrameLength) this.targetFrame = 0
+        // console.log(index)
+        this.uniforms.offset.value = new THREE.Vector2( this.targetFrame%8/8 , 1-((1+Math.floor(this.targetFrame/8))/5))
+        this.uniforms.tframe.value = this.targetFrame
+        this.targetFrame++
+    }
+    initParticle () {
+        this.particleGeometry = new THREE.Geometry();
+        let i = 0
+        for ( i = 0; i < this.particleConfig['number']; i ++ ) {
+            var vertex = new THREE.Vector3();
+            let minPos = this.particleConfig.minPos
+            let maxPos = this.particleConfig.maxPos
+            vertex.x = this.randomFloat(minPos.x, maxPos.x);
+            vertex.y = this.randomFloat(minPos.x, maxPos.x);
+            vertex.z = this.randomFloat(minPos.x, maxPos.x);
+            this.particleGeometry.vertices.push( vertex );
+        }
+        // vertex colors
+        let colors: THREE.Color[] = [];
+        for( i = 0; i < this.particleGeometry.vertices.length; i++ ) {
+            // random color
+            colors[i] = new THREE.Color();
+            colors[i].setHSL( Math.random(), 1.0, 0.5 );
+        }
+        this.particleGeometry.colors = colors;
+        // this.defaultMaterial = new THREE.CanvasTexture( this.generateSprite() );
+        this.particleMaterial = new THREE.PointsMaterial({
+            map: THREE.ImageUtils.loadTexture(imgSrc2),
+            // depthTest: false,
+            // blending: THREE.AdditiveBlending,
+            transparent: true
+        })
+        // this.particleMaterial = this.createShaderMaterial()
+        this.particleMaterial.alphaTest = 0.5
         this.particleContainer = new THREE.Group()
         let particle
-        for (let i=0; i<this.particleConfig['number']; i++) {
-            particle = new Particle(this.particleMaterial || this.defaultMaterial)
-            this.firstSetParticle(particle)
+        for ( i = 0; i < 1; i++) {
+            particle = new Particle(this.particleGeometry, this.particleMaterial)
+            // this.firstSetParticle(particle)
             this.particleContainer.add(particle)
             this.particles.push(particle)
         }
@@ -213,22 +296,37 @@ class App{
         requestAnimationFrame(this.enterFrame.bind(this));
 
         let i = 0
-        let temp
-        let minPos = this.particleConfig.minPos
-        let maxPos = this.particleConfig.maxPos
-        for(i=0;i<this.particles.length;i++){
-            temp = this.particles[i]
-            temp.px += temp.speedX * 0.05
-            temp.py += temp.speedY * 0.05
-            temp.pz += temp.speedZ * 0.05
-            temp.prot += temp.speedRot * 180 / Math.PI * 0.05
-            this.particleMaterial.rotation += temp.speedRot
-            if (temp.px < minPos.x || temp.px > maxPos.x || 
-                temp.py < minPos.y || temp.py > maxPos.y || 
-                temp.pz < minPos.z || temp.pz > maxPos.z){
-                this.resetParticle(temp)
-            }
+        // let temp
+        // let minPos = this.particleConfig.minPos
+        // let maxPos = this.particleConfig.maxPos
+        // for(i=0;i<this.particles.length;i++){
+        //     temp = this.particles[i]
+        //     temp.px += temp.speedX * 0.05
+        //     temp.py += temp.speedY * 0.05
+        //     temp.pz += temp.speedZ * 0.05
+        //     temp.prot += temp.speedRot * 180 / Math.PI * 0.05
+        //     // this.particleMaterial.rotation += temp.speedRot
+        //     if (temp.px < minPos.x || temp.px > maxPos.x || 
+        //         temp.py < minPos.y || temp.py > maxPos.y || 
+        //         temp.pz < minPos.z || temp.pz > maxPos.z){
+        //         this.resetParticle(temp)
+        //     }
+        // }
+
+        let vertex = this.particleGeometry.vertices
+        for ( i = 0; i < vertex.length; i ++ ) {
+            // vertex[i].x += 1.0 * 0.05
+            vertex[i].y += -1.0 * 0.05
+            // vertex[i].z += 1.0 * 0.05
         }
+        // this.particleGeometry.verticesNeedUpdate = true;
+
+        // var time = this.clock.getDelta() * 1000
+        // this.rate += time
+        // if(this.rate > 1000/20){
+        //     this.updateUniforms()
+        //     this.rate = 0
+        // }
 
         this.controls.update();
         this.renderer.render( this.scene, this.camera )
