@@ -1,11 +1,15 @@
 import * as THREE from 'three'
 
-class Particle extends THREE.Points{
+class Particle extends THREE.Mesh{
 
     public speedX: number = 0
     public speedY: number = 0
     public speedZ: number = 0
     public speedRot: number = 0
+    public boomSpeed: number = 0
+    public lastUpdateTime: number = 0
+    
+    private uniforms: any
     
     get px():number {
         return this.position.x;
@@ -26,24 +30,27 @@ class Particle extends THREE.Points{
         this.position.z = val;
     }
     get psize():number {
-        return this.scale.x;
+        return (this.material as THREE.ShaderMaterial).uniforms.scale.value.x;
     }
     set psize(val:number) {
-        this.scale.x = this.scale.y = val;
+        (this.material as THREE.ShaderMaterial).uniforms.scale.value = new THREE.Vector3(val, val, val)
     }
     get prot():number {
-        return this.rotation.z
+        return (this.material as THREE.ShaderMaterial).uniforms.rotation.value
     }
     set prot(val:number) {
-        this.rotation.z = val;
+        (this.material as THREE.ShaderMaterial).uniforms.rotation.value = val
     }
 
-    constructor(geometry: THREE.Geometry, material: THREE.Material){
-        super(geometry, material)
+    get targetFrame():number {
+        return (this.material as THREE.ShaderMaterial).uniforms.frame.value
+    }
+    set targetFrame(val:number) {
+        (this.material as THREE.ShaderMaterial).uniforms.frame.value = val
     }
 
-    update () {
-
+    constructor(material){
+        super(new THREE.PlaneGeometry(1, 1), material)
     }
 }
 
