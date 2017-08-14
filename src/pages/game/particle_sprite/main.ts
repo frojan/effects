@@ -86,6 +86,12 @@ class App{
                         "isNeedKeepDir": false
                     }
 
+    private colorPar = {
+        colorStart: {r:255,g:255,b:255},
+        startAlpha: 1,
+        colorEnd: {r:255,g:255,b:255},
+        endAlpha: 1
+    };
     private config: FizzyText
     private gui: dat.GUI
 
@@ -149,6 +155,7 @@ class App{
             uniform sampler2D texture;
             uniform float frame;
             uniform vec3 frameData;
+            uniform vec4 mcolor;
             float mmod (float x, float y) {
                 return x - y * floor(x*100.0/(y*100.0));
             }
@@ -158,7 +165,7 @@ class App{
                 float temp = mmod(frame, frameData.z);
                 vec2 offset = vec2( mmod(temp,frameData.x) / frameData.x, 1.0-((1.0+floor(temp*100.0/(frameData.x*100.0)))/frameData.y) );
                 vec4 color0 = texture2D( texture, uv * repeat + offset );
-                gl_FragColor = color0;
+                gl_FragColor = color0 * mcolor;
                 
             }`
         this.uniforms = {
@@ -166,6 +173,7 @@ class App{
             scale: {type: 'v3', value: new THREE.Vector3(1,1,1)},
             rotation: {type: 'float', value: 0},
             frame: {type: 'float', value: 0.0},
+            mcolor: {type: 'v4', value:new THREE.Vector4(1,1,1,1)},
             frameData: {type: 'v3', value: new THREE.Vector3(this.particleConfig.frameCountPerRow,Math.ceil(this.particleConfig.particleFrameCount/this.particleConfig.frameCountPerRow),this.particleConfig.particleFrameCount)}
         }
         var shaderMaterial = new THREE.ShaderMaterial({
@@ -202,6 +210,8 @@ class App{
         let maxPos = this.particleConfig.maxPos
         let minSpeed = this.particleConfig.minSpeed
         let maxSpeed = this.particleConfig.maxSpeed
+        let colorStart = this.particleConfig.colorStart
+        let colorEnd = this.particleConfig.colorEnd
 
         particle.px = this.randomFloat(minPos.x, maxPos.x);
         particle.py = this.randomFloat(minPos.y, maxPos.y);
@@ -213,6 +223,12 @@ class App{
         particle.boomSpeed = this.randomFloat(0.5, 1) * (this.particleConfig.maxUpdateFrameSpeed - this.particleConfig.minUpdateFrameSpeed) + this.particleConfig.minUpdateFrameSpeed
         particle.psize = this.particleConfig.scale;
         particle.targetFrame = Math.floor(this.randomFloat(0, this.particleConfig.particleFrameCount))
+        particle.pcolor = {
+            x: this.randomFloat(colorStart.x, colorEnd.x),
+            y: this.randomFloat(colorStart.y, colorEnd.y),
+            z: this.randomFloat(colorStart.z, colorEnd.z),
+            w: this.randomFloat(colorStart.w, colorEnd.w)
+        }
     }
     randomFloat(min, max) {
         return Math.random() * (max - min) + min;
@@ -277,6 +293,31 @@ class App{
         });
         folder4.add(this.particleConfig.maxSpeed, 'z').onChange(()=>{
             this.updateParticles()
+        });
+        let folder5 = this.gui.addFolder( '颜色范围' );
+        folder5.addColor(this.colorPar, 'colorStart').onFinishChange(()=>{
+            this.particleConfig.colorStart.x = this.colorPar.colorStart.r/255;
+            this.particleConfig.colorStart.y = this.colorPar.colorStart.g/255;
+            this.particleConfig.colorStart.z = this.colorPar.colorStart.b/255;
+            this.clearPartices()
+            this.initParticle()
+        });
+        folder5.add(this.colorPar, 'startAlpha', 0, 1).step(0.01).onFinishChange(()=>{
+            this.particleConfig.colorStart.w = this.colorPar.startAlpha;
+            this.clearPartices()
+            this.initParticle()
+        });
+        folder5.addColor(this.colorPar, 'colorEnd').onFinishChange(()=>{
+            this.particleConfig.colorEnd.x = this.colorPar.colorEnd.r/255;
+            this.particleConfig.colorEnd.y = this.colorPar.colorEnd.g/255;
+            this.particleConfig.colorEnd.z = this.colorPar.colorEnd.b/255;
+            this.clearPartices()
+            this.initParticle()
+        });
+        folder5.add(this.colorPar, 'endAlpha', 0, 1).step(0.01).onFinishChange(()=>{
+            this.particleConfig.colorEnd.w = this.colorPar.endAlpha;
+            this.clearPartices()
+            this.initParticle()
         });
 
         let other = this.gui.addFolder( '其他' );
@@ -356,6 +397,15 @@ class App{
                     temp.px = this.randomFloat(minPos.x, maxPos.x);
                     temp.py = this.randomFloat(minPos.y, maxPos.y);
                     temp.pz = this.randomFloat(minPos.z, maxPos.z);
+
+                    let colorStart = this.particleConfig.colorStart
+                    let colorEnd = this.particleConfig.colorEnd
+                    temp.pcolor = {
+                        x: this.randomFloat(colorStart.x, colorEnd.x),
+                        y: this.randomFloat(colorStart.y, colorEnd.y),
+                        z: this.randomFloat(colorStart.z, colorEnd.z),
+                        w: this.randomFloat(colorStart.w, colorEnd.w)
+                    }
                 }
                 if(needChangeDir){
                     let minSpeed = this.particleConfig.minSpeed

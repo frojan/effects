@@ -41,12 +41,26 @@ class Particle extends THREE.Mesh{
     set prot(val:number) {
         (this.material as THREE.ShaderMaterial).uniforms.rotation.value = val
     }
-
+    // 当前帧
     get targetFrame():number {
         return (this.material as THREE.ShaderMaterial).uniforms.frame.value
     }
     set targetFrame(val:number) {
         (this.material as THREE.ShaderMaterial).uniforms.frame.value = val
+    }
+    get pcolor():any {
+        // return (this.material as THREE.ShaderMaterial).uniforms.frame.value
+        let col = (this.material as THREE.ShaderMaterial).uniforms.mcolor.value
+        return {
+            x:col.x,
+            y:col.y,
+            z:col.z,
+            w:col.w
+        }
+    }
+    set pcolor(val:any) {
+        let color = new THREE.Vector4(val.x, val.y, val.z, val.w);
+        (this.material as THREE.ShaderMaterial).uniforms.mcolor.value = color
     }
 
     constructor(material){
