@@ -5,7 +5,7 @@ import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
 import Particle from './Particle'
 declare function require(string): string;
-var imgSrc = require('@/assets/chong.png')
+var imgSrc = require('@/assets/fireworks1.png')
 
 class App{
     private static SCREEN_WIDTH = document.documentElement.clientWidth
@@ -35,56 +35,56 @@ class App{
     private canvasHeight: number = 1200 * 0.5
 
     private particleConfig = {
-        "textures": [
-            "resource/chong.png"
-        ],
-        "number": 1000,
-        "minPos": {
-            "x": -50,
-            "y": -50,
-            "z": -50,
-            "w": 1
-        },
-        "maxPos": {
-            "x": 50,
-            "y": 50,
-            "z": 50,
-            "w": 1
-        },
-        "minSpeed": {
-            "x": -7.5,
-            "y": -7.5,
-            "z": -7.5,
-            "w": 1
-        },
-        "maxSpeed": {
-            "x": 7.5,
-            "y": 7.5,
-            "z": 7.5,
-            "w": 1
-        },
-        "maxRotSpeed": 5,
-        "isHaveLife": false,
-        "colorStart": {
-            "x": 1,
-            "y": 1,
-            "z": 1,
-            "w": 1
-        },
-        "colorEnd": {
-            "x": 1,
-            "y": 1,
-            "z": 1,
-            "w": 1
-        },
-        "isNeedChangeDir": false,
-        "minUpdateFrameSpeed": 10,
-        "maxUpdateFrameSpeed": 20,
-        "scale": 1,
-        "frameCountPerRow": 8,
-        "particleFrameCount": 40,
-        "isNeedKeepDir": false     // 没用
-    }
+                        "textures": [
+                            "resource/fireworks1.png"
+                        ],
+                        "number": 10,
+                        "minPos": {
+                            "x": -10,
+                            "y": 10,
+                            "z": -30,
+                            "w": 1
+                        },
+                        "maxPos": {
+                            "x": 10,
+                            "y": 18,
+                            "z": 30,
+                            "w": 1
+                        },
+                        "minSpeed": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                            "w": 1
+                        },
+                        "maxSpeed": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                            "w": 1
+                        },
+                        "maxRotSpeed": 0,
+                        "particleFrameCount": 25,
+                        "frameCountPerRow": 5,
+                        "isHaveLife": true,
+                        "colorStart": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1,
+                            "w": 1
+                        },
+                        "colorEnd": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1,
+                            "w": 1
+                        },
+                        "isNeedChangeDir": false,
+                        "minUpdateFrameSpeed": 50,
+                        "maxUpdateFrameSpeed": 100,
+                        "scale": 3.5,
+                        "isNeedKeepDir": false
+                    }
 
     private config: FizzyText
     private gui: dat.GUI
@@ -149,12 +149,17 @@ class App{
             uniform sampler2D texture;
             uniform float frame;
             uniform vec3 frameData;
+            float mmod (float x, float y) {
+                return x - y * floor(x*100.0/(y*100.0));
+            }
             void main() {
-                vec2 uv = vec2(1.0 - fUV.x, 1.0 - fUV.y);
+                vec2 uv = vec2(fUV.x, fUV.y);
                 vec2 repeat = vec2(1.0/frameData.x, 1.0/frameData.y);
-                float temp = mod(frame, frameData.z);
-                vec4 color0 = texture2D( texture, uv * repeat + vec2( mod(temp,frameData.x) / frameData.x, 1.0-((1.0+floor(temp/frameData.x))/frameData.y) ) );
+                float temp = mmod(frame, frameData.z);
+                vec2 offset = vec2( mmod(temp,frameData.x) / frameData.x, 1.0-((1.0+floor(temp*100.0/(frameData.x*100.0)))/frameData.y) );
+                vec4 color0 = texture2D( texture, uv * repeat + offset );
                 gl_FragColor = color0;
+                
             }`
         this.uniforms = {
             texture: {type: 't', value: texture},
@@ -307,7 +312,7 @@ class App{
             this.initParticle()
         });
 
-        // this.gui.remember(this.config)
+        this.gui.remember(this.particleConfig)
         this.gui.revert(this.gui)
     }
 
