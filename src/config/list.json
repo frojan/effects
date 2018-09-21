@@ -29,6 +29,10 @@
     {
       "name": "particle_sprite",
       "path": "particle_sprite"
+    },
+    {
+      "name": "gltfTest",
+      "path": "gltfTest"
     }
   ]
 }

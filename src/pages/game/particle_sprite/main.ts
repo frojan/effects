@@ -1,11 +1,10 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/js/libs/stats.min'
 import 'three/examples/js/controls/OrbitControls'
-import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
 import Particle from './Particle'
 declare function require(string): string;
-var imgSrc = require('@/assets/fireworks1.png')
+var imgSrc = require('@/assets/smoke3.png')
 
 class App{
     private static SCREEN_WIDTH = document.documentElement.clientWidth
@@ -15,7 +14,7 @@ class App{
     private renderer: THREE.WebGLRenderer
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
-    private controls: THREE.OrbitControls | THREE.DeviceOrientationControls
+    private controls: THREE.OrbitControls
 
     private stats: Stats
 
@@ -38,52 +37,53 @@ class App{
                         "textures": [
                             "resource/fireworks1.png"
                         ],
-                        "number": 10,
+                        "number": 50,
                         "minPos": {
-                            "x": -10,
-                            "y": 10,
-                            "z": -30,
+                            "x": -20,
+                            "y": 0,
+                            "z": -20,
                             "w": 1
                         },
                         "maxPos": {
-                            "x": 10,
-                            "y": 18,
-                            "z": 30,
+                            "x": 20,
+                            "y": 0,
+                            "z": 20,
                             "w": 1
                         },
                         "minSpeed": {
                             "x": 0,
-                            "y": 0,
+                            "y": 10,
                             "z": 0,
                             "w": 1
                         },
                         "maxSpeed": {
                             "x": 0,
-                            "y": 0,
+                            "y": 20,
                             "z": 0,
                             "w": 1
                         },
                         "maxRotSpeed": 0,
-                        "particleFrameCount": 25,
-                        "frameCountPerRow": 5,
+                        "particleFrameCount": 64,
+                        "frameCountPerRow": 8,
                         "isHaveLife": true,
                         "colorStart": {
-                            "x": 1,
-                            "y": 1,
-                            "z": 1,
-                            "w": 1
+                            "x": 0,
+                            "y": 0,
+                            "z": 0.4,
+                            "w": 0.3
                         },
                         "colorEnd": {
-                            "x": 1,
-                            "y": 1,
-                            "z": 1,
-                            "w": 1
+                            "x": 0,
+                            "y": 0,
+                            "z": 0.4,
+                            "w": 0.8
                         },
-                        "isNeedChangeDir": false,
-                        "minUpdateFrameSpeed": 50,
+                        "isNeedChangeDir": true,
+                        "minUpdateFrameSpeed": 100,
                         "maxUpdateFrameSpeed": 100,
-                        "scale": 3.5,
-                        "isNeedKeepDir": false
+                        "scale": 100,
+                        "isNeedKeepDir": false,
+                        "noLimitPos": true
                     }
 
     private colorPar = {
@@ -181,9 +181,9 @@ class App{
             vertexShader: vertexshader,
             fragmentShader: fragmentShader,
             transparent: true,
-            vertexColors: THREE.VertexColors
-            // depthTest: false,
-            // blending: THREE.AdditiveBlending
+            vertexColors: THREE.VertexColors,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
         })
 
         return shaderMaterial
@@ -201,6 +201,14 @@ class App{
             this.particleContainer.add(particle)
             this.particles.push(particle)
         }
+        this.colorPar.colorStart.r = this.particleConfig.colorStart.x * 255
+        this.colorPar.colorStart.g = this.particleConfig.colorStart.y * 255
+        this.colorPar.colorStart.b = this.particleConfig.colorStart.z * 255
+        this.colorPar.startAlpha = this.particleConfig.colorStart.w
+        this.colorPar.colorEnd.r = this.particleConfig.colorEnd.x * 255
+        this.colorPar.colorEnd.g = this.particleConfig.colorEnd.y * 255
+        this.colorPar.colorEnd.b = this.particleConfig.colorEnd.z * 255
+        this.colorPar.endAlpha = this.particleConfig.colorEnd.w
 
         this.scene.add(this.particleContainer)
     }
@@ -352,6 +360,8 @@ class App{
             this.clearPartices()
             this.initParticle()
         });
+        other.add(this.particleConfig, 'noLimitPos').onChange(()=>{   
+        });
 
         this.gui.remember(this.particleConfig)
         this.gui.revert(this.gui)
@@ -388,6 +398,7 @@ class App{
         let totalFrame =  this.particleConfig.particleFrameCount
         let hasLife = this.particleConfig.isHaveLife
         let needChangeDir = this.particleConfig.isNeedChangeDir
+        let noLimitPos = this.particleConfig.noLimitPos
         for(i = 0; i < this.particles.length; i++){
             temp = this.particles[i]
             intervalTime = time - temp.lastUpdateTime
@@ -421,9 +432,13 @@ class App{
             temp.pz += temp.speedZ * intervalTime
             temp.prot += temp.speedRot * intervalTime
             
-            temp.px = this.clampFun(temp.px, minPos.x, maxPos.x)
-            temp.py = this.clampFun(temp.py, minPos.y, maxPos.y)
-            temp.pz = this.clampFun(temp.pz, minPos.z, maxPos.z)
+            if(!noLimitPos){
+                temp.px = this.clampFun(temp.px, minPos.x, maxPos.x)
+                temp.py = this.clampFun(temp.py, minPos.y, maxPos.y)
+                temp.pz = this.clampFun(temp.pz, minPos.z, maxPos.z)
+            }
+
+
             temp.prot = this.clampFun(temp.prot, 0, Math.PI * 2)
 
             temp.targetFrame++

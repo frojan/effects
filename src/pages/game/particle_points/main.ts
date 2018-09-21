@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/js/libs/stats.min'
 import 'three/examples/js/controls/OrbitControls'
-import 'three/examples/js/controls/DeviceOrientationControls'
 declare function require(string): string;
 
 class App{
@@ -12,7 +11,7 @@ class App{
     private renderer: THREE.WebGLRenderer
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
-    private controls: THREE.OrbitControls | THREE.DeviceOrientationControls
+    private controls: THREE.OrbitControls
 
     private stats: Stats
 
@@ -98,8 +97,8 @@ class App{
 
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
         this.camera.position.z = 10;
-        // this.controls = new THREE.OrbitControls( this.camera, this.gameArea );
-        this.controls = new THREE.DeviceOrientationControls( this.camera );
+        this.controls = new THREE.OrbitControls( this.camera, this.gameArea );
+        // this.controls = new THREE.DeviceOrientationControls( this.camera );
 
         this.initLight()
         this.initObj()

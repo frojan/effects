@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/js/libs/stats.min'
 import 'three/examples/js/controls/OrbitControls'
-import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
 
 class App{
@@ -13,7 +12,7 @@ class App{
     private renderer: THREE.WebGLRenderer
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
-    private controls: THREE.OrbitControls | THREE.DeviceOrientationControls
+    private controls: THREE.OrbitControls
 
     private stats: Stats
 

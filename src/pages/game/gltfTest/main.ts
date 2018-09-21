@@ -1,9 +1,11 @@
 import * as THREE from 'three'
 import Stats from 'three/examples/js/libs/stats.min'
 import 'three/examples/js/controls/OrbitControls'
-// import 'three/examples/js/controls/DeviceOrientationControls'
 import dat from 'dat-gui'
+declare function require(string): string;
+require("@/lib/LegacyGLTFLoader.js")
 
+/* tslint-disable */
 class App{
     private static NUM = 20
     private static SCREEN_WIDTH = document.documentElement.clientWidth
@@ -40,7 +42,6 @@ class App{
         this.camera.position.y = 100
         this.camera.position.z = 100
         this.controls = new THREE.OrbitControls( this.camera, this.gameArea );
-        // this.controls = new THREE.DeviceOrientationControls( this.camera );
 
         this.disableDefaultDrag()
         this.initLight()
@@ -103,7 +104,7 @@ class App{
     }
     
     initObject () {
-        
+        // let loader = new THREE.GLTFLoader();
     }
 
     enterFrame () {
